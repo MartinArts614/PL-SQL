@@ -1,0 +1,1083 @@
+ SELECT mensaje, folio, origen_gananciaCambiaria, origen_valorEnvio, 
+  origen_envioFinal,origen_vigencia, destino_gananciaCambiaria, 
+  destino_valorPago, destino_pagoFinal, destino_vigencia, usuario_Consulta, 
+  fecha_operacion 
+  FROM usrcon.TRANSACIONES_TIPO_CAMBIO;
+  
+  
+  SELECT 
+  mensaje, 
+  folio, 
+  origen_gananciaCambiaria, 
+  origen_valorEnvio, 
+  origen_envioFinal, 
+  origen_vigencia, 
+  destino_gananciaCambiaria, 
+  destino_valorPago, 
+  destino_pagoFinal, 
+  destino_vigencia, 
+  fecha_operacion
+FROM 
+  usrcon.TRANSACIONES_TIPO_CAMBIO
+WHERE 
+  CONVERT(DATE, fecha_operacion) BETWEEN  '2024-06-19' AND '2024-06-20'
+  
+  SELECT * FROM usercon.TCPAISES;
+ 
+ DECLARE @duplicateExists INT, @folio VARCHAR(25)
+ SELECT @duplicateExists = CASE WHEN EXISTS (  
+  SELECT * FROM usrcon.TRANSACIONES_TIPO_CAMBIO WHERE folio = @folio  
+) THEN 1 ELSE 0 END  
+  
+IF @duplicateExists = 0  
+BEGIN
+ SELECT * FROM usrcon.TC_PAISES_PARAM A JOIN usrcon.TRANSACIONES_TIPO_CAMBIO B ON 1=1
+ END
+ 
+ DECLARE @duplicateExists INT, @folio VARCHAR(25)
+ SELECT @duplicateExists = CASE WHEN EXISTS (  
+  SELECT * FROM usrcon.TRANSACIONES_TIPO_CAMBIO JOIN usrcon.TRANSACIONES_TIPO_CAMBIO ON 1=1 WHERE folio = @folio  
+) THEN 1 ELSE 0 END  
+  
+IF @duplicateExists = 0  
+BEGIN
+ SELECT * FROM usrcon.TC_PAISES_PARAM  JOIN usrcon.TRANSACIONES_TIPO_CAMBIO  ON 1=1
+ END
+ 
+ 
+DECLARE @duplicateExists INT, @folio VARCHAR(25)
+
+SELECT @duplicateExists = CASE WHEN EXISTS (
+  SELECT * FROM usrcon.TRANSACIONES_TIPO_CAMBIO JOIN usrcon.TC_PAISES_PARAM ON 1=1 WHERE folio = @folio
+) THEN 1 ELSE 0 END
+
+IF @duplicateExists = 0
+BEGIN
+  SELECT tcp.* 
+  FROM usrcon.TRANSACIONES_TIPO_CAMBIO JOIN usrcon.TC_PAISES_PARAM tcp ON 1=1
+  WHERE NOT EXISTS (
+    SELECT * FROM usrcon.TRANSACIONES_TIPO_CAMBIO ttc WHERE ttc.folio = @folio
+  )
+END
+
+
+DECLARE @duplicateExists INT, @folio VARCHAR(25)
+
+SELECT @duplicateExists = CASE WHEN EXISTS (
+  SELECT * FROM  usrcon.TC_PAISES_PARAM JOIN usrcon.TRANSACIONES_TIPO_CAMBIO ON 1=1 WHERE folio = @folio
+) THEN 1 ELSE 0 END
+
+IF @duplicateExists = 0
+BEGIN
+  SELECT * 
+  FROM usrcon.TC_PAISES_PARAM  JOIN  usrcon.TRANSACIONES_TIPO_CAMBIO  ON 1=1
+  WHERE usrcon.TRANSACIONES_TIPO_CAMBIO.folio != usrcon.TRANSACIONES_TIPO_CAMBIO.folio
+  
+END
+
+DECLARE @duplicateExists INT, @folio VARCHAR(25)
+
+SELECT @duplicateExists = CASE WHEN EXISTS (
+  SELECT 1 FROM usrcon.TC_PAISES_PARAM 
+  JOIN usrcon.TRANSACIONES_TIPO_CAMBIO ON 1=1 
+  WHERE usrcon.TRANSACIONES_TIPO_CAMBIO.folio = @folio
+) THEN 1 ELSE 0 END
+
+IF @duplicateExists = 0
+BEGIN
+  SELECT DISTINCT * 
+  FROM usrcon.TC_PAISES_PARAM 
+  JOIN usrcon.TRANSACIONES_TIPO_CAMBIO ON 1=1 
+  WHERE usrcon.TRANSACIONES_TIPO_CAMBIO.folio = @folio
+END
+
+SELECT * FROM usrcon.TRANSACIONES_TIPO_CAMBIO;
+
+
+SELECT * FROM usrcon.TC_PAISES_PARAM;
+
+SELECT FC_direccion  FROM  Concilia_banco.usrcon.PS_FYCAPTAALN_PARAM WITH(NOLOCK) 
+		WHERE FI_ESTATUS=1 AND FC_direccion IS NOT NULL AND FC_direccion <> ''
+		group by FC_direccion 
+		ORDER BY FC_direccion ASC;
+SELECT FI_idParam
+		FROM Concilia_banco.usrcon.PS_FYCAPTAALN_PARAM WITH(NOLOCK) WHERE FI_ESTATUS=1; 
+
+EXEC usrcon.SP_TIPO_CAMBIO 
+    @mensaje = 'Mensaje de prueba',
+    @folio = 'Folio123',
+    @petecion_agente = 'Agente 1',
+    @petecion_subsidiaria = 'Subsidiaria 1',
+    @origen_pais = 'Pais de origen',
+    @origen_gananciaCambiaria = 'Ganancia cambiaria origen',
+    @origen_valorEnvio = 'Valor envio origen',
+    @origen_envioFinal = 'Envio final origen',
+    @origen_vigencia = 'Vigencia origen',
+    @destino_pais = 'Pais de destino',
+    @destino_gananciaCambiaria = 'Ganancia cambiaria destino',
+    @destino_valorPago = 'Valor pago destino',
+    @destino_pagoFinal = 'Pago final destino',
+    @destino_vigencia = 'Vigencia destino',
+    @usuario_Consulta = 'Usuario de consulta',
+    @fecha_operacion = '2022-01-01 12:00:00';
+   
+   EXEC usrcon.SP_TIPO_CAMBIO_CONSULTA
+    @origen_pais = '1',
+	@destino_pais = '2',
+	@fecha_ini = '2024-06-24',
+	@fecha_fin = '2024-06-28';
+ 
+ 
+ALTER PROCEDURE [usrcon].[SP_TIPO_CAMBIO_CONSULTA] 
+   
+ @origen_pais VARCHAR (25), 
+ @destino_pais VARCHAR (25), 
+ @fecha_ini VARCHAR (25), 
+ @fecha_fin VARCHAR (25) 
+AS   
+BEGIN    
+  
+  SELECT petecion_agente, petecion_subsidiaria, origen_pais, origen_gananciaCambiaria, origen_valorEnvio,  
+  origen_envioFinal,origen_vigencia,destino_pais, destino_gananciaCambiaria,  
+  destino_valorPago, destino_pagoFinal, destino_vigencia 
+  FROM usrcon.TRANSACIONES_TIPO_CAMBIO WITH(NOLOCK) 
+  WHERE CONVERT(VARCHAR(10),fecha_operacion,121)>=  @fecha_ini AND CONVERT(VARCHAR(10),fecha_operacion,121) <=  @fecha_fin --  BETWEEN CONVERT(VARCHAR(10),@Fecha_Inicial,121) AND CONVERT(VARCHAR(10),@Fecha_Final,121) 
+  AND origen_pais = @origen_pais 
+  AND destino_pais = @destino_pais; 
+   
+END  
+ 
+SET NOCOUNT ON
+---------------------------------------------------------------------------------------------------------------
+EXEC usrcon.SP_TIPO_CAMBIO_COMBO
+ @OPC = 4,
+ @idPais = 2,
+ @idAgente = 1;
+
+DROP TABLE usrcon.TCPAISES_TPCMB;
+DROP TABLE usrcon.TCMONEDAS_TPCMB;
+DROP TABLE usrcon.TCMONEDAS_PAISES_TPCMB;
+DROP TABLE usrcon.TCAGENTES_TPCMB;
+DROP TABLE usrcon.TCSUBSIDIARIAS_TPCMB;
+DROP TABLE usrcon.CONCIL_ALNCAJA_OPEDEX;
+DROP TABLE usrcon.CONCIL_ALNCAJA_OPEDEX_TC;
+DROP TABLE usrcon.OP_DEX_TIPO_CAMBIO;
+DROP TABLE usrcon.TC_ALNCAJA_CONCIL;
+
+SELECT * FROM usrcon.TCPAISES_TPCMB;
+SELECT * FROM usrcon.TCMONEDAS_TPCMB;
+SELECT * FROM usrcon.TCMONEDAS_PAISES_TPCMB;
+SELECT * FROM usrcon.TCAGENTES_TPCMB;
+SELECT * FROM usrcon.TCSUBSIDIARIAS_TPCMB;
+SELECT * FROM usrcon.CONCIL_ALNCAJA_OPEDEX;
+SELECT * FROM usrcon.CONCIL_ALNCAJA_OPEDEX_TC;
+SELECT * FROM usrcon.OP_DEX_TIPO_CAMBIO;
+SELECT * FROM usrcon.TC_ALNCAJA_CONCIL;
+
+CREATE TABLE [usrcon].[TCPAISES_TPCMB] (
+	[idPais] int NOT NULL,
+	[pais] varchar(50),
+)WITH(DATA_COMPRESSION=PAGE);
+ALTER TABLE usrcon.TCPAISES_TPCMB 
+	ADD CONSTRAINT PK_TCPAISES_TPCMB PRIMARY KEY CLUSTERED
+(idPais);
+
+
+CREATE TABLE [usrcon].[TCMONEDAS_TPCMB] (
+[idMoneda] int NOT NULL,
+[moneda] VARCHAR(50),
+)WITH(DATA_COMPRESSION=PAGE);
+ALTER TABLE usrcon.TCMONEDAS_TPCMB
+   ADD CONSTRAINT PK_TCMONEDAS_TPCMB PRIMARY KEY CLUSTERED 
+(idMoneda);
+
+
+CREATE TABLE [usrcon].[TCMONEDAS_PAISES_TPCMB] (
+[idMopa] int NOT NULL,
+[IdPais] int,
+[idMoneda] int,
+[moneda] VARCHAR(50),
+) WITH(DATA_COMPRESSION=PAGE);
+ALTER TABLE usrcon.TCMONEDAS_PAISES_TPCMB
+   ADD CONSTRAINT PK_TCMONEDAS_PAISES_TPCMB PRIMARY KEY CLUSTERED 
+(idMopa);
+
+
+CREATE TABLE [usrcon].[TCAGENTES_TPCMB](
+[idTbl] int NOT NULL,
+[IdPais] int,
+[idAgente] int,
+[agente] VARCHAR(50),
+) WITH(DATA_COMPRESSION=PAGE);
+ALTER TABLE usrcon.TCAGENTES_TPCMB
+   ADD CONSTRAINT PK_TCAGENTES_TPCMB PRIMARY KEY CLUSTERED
+(idTbl);
+
+
+CREATE TABLE [usrcon].[TCSUBSIDIARIAS_TPCMB](
+[idTbl] int NOT NULL,
+[idPais] int,
+[idAgente] int,
+[idSubsidiaria] int,
+[subsidiaria] VARCHAR(50),
+) WITH(DATA_COMPRESSION=PAGE);
+ALTER TABLE usrcon.TCSUBSIDIARIAS_TPCMB
+   ADD CONSTRAINT PK_TCSUBSIDIARIAS_TPCMB PRIMARY KEY CLUSTERED
+(idTbl);
+
+
+CREATE TABLE [usrcon].[CONCIL_ALNCAJA_OPEDEX] (
+[NOM_PAIS_ORIG] VARCHAR(10) NULL,
+[NOM_PAIS_DEST] VARCHAR(15) NULL,
+[CLAVE_SUC_AGE_MVTO] VARCHAR(10) NULL,
+[MTCN] VARCHAR(15) NULL,
+[FECHA_TRANSC] VARCHAR(20) NULL,
+[MTO_ENVIO] VARCHAR(15) NULL,
+[MTO_ENVIO_USD] VARCHAR(15) NULL,
+[COMISION] VARCHAR(10) NULL,
+[NOM_AGEN_MVTO] VARCHAR(40) NULL,
+[NOM_SUBS_MTVO] VARCHAR(40) NULL,
+[TOTAL_IMPTO_MXP] VARCHAR(8) NULL,
+[MTO_RED] VARCHAR(8) NULL,
+[FOLIO_AFECT] VARCHAR(10) NULL,
+[TC_TESO_PVP_PD] VARCHAR(10) NULL,
+[TIPO_CAMB] VARCHAR(8) NULL,
+[FNIMPMOV_CAJA] VARCHAR(15) NULL
+) WITH(DATA_COMPRESSION=PAGE);
+
+CREATE TABLE [usrcon].[CONCIL_ALNCAJA_OPEDEX_TC] (
+	NOM_PAIS_ORIG varchar(10) NULL,
+	NOM_PAIS_DEST varchar(15) NULL,
+	CLAVE_SUC_AGE_MVTO varchar(10) NULL,
+	MTCN varchar(15) NULL,
+	FECHA_TRANSC varchar(20) NULL,
+	MTO_ENVIO varchar(15) NULL,
+	MTO_ENVIO_USD varchar(15) NULL,
+	COMISION varchar(10) NULL,
+	NOM_AGEN_MVTO varchar(40) NULL,
+	NOM_SUBS_MTVO varchar(40) NULL,
+	TOTAL_IMPTO_MXP varchar(8) NULL,
+	MTO_RED varchar(8) NULL,
+	FOLIO_AFECT varchar(10) NULL,
+	TIPO_CAMB_USD varchar(10) NULL,
+	TIPO_CAMB varchar(8) NULL,
+	FNIMPMOV_CAJA varchar(15) NULL
+)WITH(DATA_COMPRESSION=PAGE);
+
+
+CREATE TABLE [usrcon].[OP_DEX_TIPO_CAMBIO] (
+[ID_MOVIMTO] VARCHAR(50) NULL,
+[ID_PAIS_ORIG] VARCHAR(50) NULL,
+[NOM_PAIS_ORIG] VARCHAR(50) NULL,
+[ID_PAIS_DEST] VARCHAR(50) NULL,
+[NOM_PAIS_DEST] VARCHAR(50) NULL,
+[ID_AGEN_MVTO] VARCHAR(50) NULL,
+[NOM_AGEN_MVTO] VARCHAR(50) NULL,
+[ID_SUBS_MTVO] VARCHAR(50) NULL,
+[NOM_SUBS_MTVO] VARCHAR(50) NULL,
+[CLAVE_SUC_AGE_MVTO] VARCHAR(50) NULL,
+[MONEDA_MVTO] VARCHAR(50) NULL,
+[MTCN] VARCHAR(50) NULL,
+[FECHA_TRANSC] VARCHAR(50) NULL,
+[MTO_ENVIO] VARCHAR(50) NULL,
+[MTO_ENVIO_USD] VARCHAR(50) NULL,
+[COMISION] VARCHAR(50) NULL,
+[ID_ENVIO] VARCHAR(50) NULL,
+[CLASFIC_AGE] VARCHAR(50) NULL,
+[NOM_AGE_ENVIO] VARCHAR(50) NULL,
+[NOM_SUBSI_ENVIO] VARCHAR(50) NULL,
+[COM_ORI_MO] VARCHAR(50) NULL,
+[COM_ORI_MG] VARCHAR(50) NULL,
+[COM_ORI_MXP] VARCHAR(50) NULL,
+[COM_AGE_MO] VARCHAR(50) NULL,
+[COM_AGE_MG] VARCHAR(50) NULL,
+[COM_AGE_MXP] VARCHAR(50) NULL,
+[TOTAL_IMPTO_MXP] VARCHAR(50) NULL,
+[TOTAL_IMPTO_MG] VARCHAR(50) NULL,
+[MTO_RED] VARCHAR(50) NULL,
+[FOLIO_AFECT] VARCHAR(50) NULL,
+[TC_TESO_PVP_PD] VARCHAR(50) NULL,
+[TIPO_CAMB] VARCHAR(50) NULL
+) WITH(DATA_COMPRESSION=PAGE);
+
+CREATE TABLE [usrcon].[TC_ALNCAJA_CONCIL] (
+[T071_ACC_ALN] VARCHAR(50) NULL,
+[T071_CODE_ALN] VARCHAR(50) NULL,
+[T071_AMOUNT_ALN] VARCHAR(50) NULL,
+[T071_DAT_OPERATION_ALN] VARCHAR(50) NULL,
+[T071_TIM_OPERATION_ALN] VARCHAR(50) NULL,
+[T071_DAT_VALUE_ALN] VARCHAR(50) NULL,
+[T071_OBSERVATIONS_ALN] VARCHAR(50) NULL,
+[T071_CEN_UPDATE_ALN] VARCHAR(50) NULL,
+[FITRANNO_CAJA] int NULL,
+[FITIPOOP_CAJA] int NULL,
+[FCREFMOV_CAJA] VARCHAR(50) NULL,
+[FDMOVFECHR_CAJA] VARCHAR(50) NULL,
+[FNIMPMOV_CAJA] VARCHAR(50) NULL
+) WITH(DATA_COMPRESSION=PAGE);
+
+
+
+
+
+CREATE TABLE usrcon.TCPAISES_TPCMB (
+	idPais int primary key,
+	pais varchar(50),
+) WITH(DATA_COMPRESSION=PAGE);
+
+
+EXEC usrcon.SP_CONLTA_ALNCAJA_OPEDEX_TC
+  @PAIS_ORIGEN = 'MEXICO',
+  @PAIS_DESTINO = 'GUATEMALA',
+  @SUBSIDIARIA = 'ELEKTRA',
+  @AGENTE = 'ELEKTRA',
+  @FECHAINI = '15-06-2024',
+  @FECHAFIN = '19-06-2024';
+ 
+CREATE TABLE usrcon.TCPAISES_TPCMB (
+	idPais int primary key,
+	pais varchar(50),
+);
+
+
+CREATE TABLE usrcon.TCMONEDAS_TPCMB (
+idMoneda int primary key,
+moneda VARCHAR(50),
+);
+
+CREATE TABLE usrcon.TCMONEDAS_PAISES_TPCMB (
+idMopa int primary key,
+idPais int,
+idMoneda int,
+moneda VARCHAR(50),
+FOREIGN KEY (idPais) REFERENCES usrcon.TCPAISES_TPCMB(idPais),
+FOREIGN KEY (idMoneda) REFERENCES usrcon.TCMONEDAS_TPCMB(idMoneda)
+);
+
+CREATE TABLE usrcon.TCAGENTES_TPCMB(
+idTbl int primary key,
+idPais int,
+idAgente int,
+agente VARCHAR(50)
+FOREIGN KEY (idPais) REFERENCES usrcon.TCPAISES_TPCMB(idPais)
+);
+
+INSERT INTO usrcon.TCAGENTES_TPCMB VALUES(1,2,1,'ELEKTRA');
+
+TRUNCATE TABLE usrcon.TCAGENTES_TPCMB;
+
+
+CREATE TABLE usrcon.TCSUBSIDIARIAS_TPCMB(
+idTbl int primary key,
+idPais int,
+idAgente int,
+idSubsidiaria int,
+subsidiaria VARCHAR(50)
+FOREIGN KEY (idPais) REFERENCES usrcon.TCPAISES_TPCMB(idPais)
+);
+----------AgenteSeleccionado----------------
+SELECT 
+A.agente 
+FROM usrcon.TCAGENTES_TPCMB A
+JOIN usrcon.TCPAISES_TPCMB B ON A.idPais = B.idPais 
+WHERE A.idPais = 5;
+
+CREATE PROCEDURE usrcon.SP_TIPO_CAMBIO_AGENTE
+@idPais int
+AS
+	SET NOCOUNT ON
+BEGIN 
+	SELECT 
+	A.agente 
+	FROM usrcon.TCAGENTES_TPCMB A
+	JOIN usrcon.TCPAISES_TPCMB B ON A.idPais = B.idPais 
+	WHERE A.idPais = @idPais;
+END
+
+EXEC usrcon.SP_TIPO_CAMBIO_AGENTE @idPais = 5;
+
+EXEC usrcon.SP_TIPO_CAMBIO_COMBO @OPC = 4, @idPais = 2, @idAgente = 1;
+
+EXEC usrcon.SP_TIPO_CAMBIO_CONCILIACION;
+
+EXEC usrcon.SP_TIPO_CAMBIO_CONSULTA
+ @origen_pais = 'MEXICO', 
+ @destino_pais = 'GUATEMALA',
+ @peticion_agente = '1',
+ @peticion_subsidiaria = '1',
+ @fecha_ini = '2024-07-28', 
+ @fecha_fin =  '2024-07-30';
+
+ EXEC usrcon.SP_CONCIL_ALNCAJA_OPEDEX
+ @PAIS_ORIGEN = 'MEXICO',
+ @PAIS_DESTINO = 'GUATEMALA',
+ @SUBSIDIARIA = 'SALINAS Y ROCHA',
+ @AGENTE = 'ELEKTRA',
+ @FECHAINI = '15-06-2024',
+ @FECHAFIN = '19-06-2014';
+
+SELECT 
+  D.pais AS origen_pais, 
+  A.origen_valorEnvio,
+  B.moneda AS moneda,
+  E.pais AS destino_pais,
+  A.destino_valorPago,
+  C.moneda AS divisa
+  FROM usrcon.TRANSACIONES_TIPO_CAMBIO A WITH(NOLOCK) 
+  JOIN usrcon.TCMONEDAS_PAISES_TPCMB B ON A.origen_moneda  = B.idMoneda 
+  JOIN usrcon.TCMONEDAS_PAISES_TPCMB C ON A.destino_moneda = C.idMoneda 
+  JOIN usrcon.TCPAISES_TPCMB D ON A.origen_pais = D.idPais
+  JOIN usrcon.TCPAISES_TPCMB E ON A.destino_pais = E.idPais 
+  WHERE CONVERT(VARCHAR(10),A.fecha_operacion,121)>= '2024-07-02' AND CONVERT(VARCHAR(10),A.fecha_operacion,121) <= '2024-07-04'
+  AND D.pais = 'MEXICO' 
+  AND E.pais = 'GUATEMALA'
+  AND A.peticion_agente = 1
+  AND A.peticion_subsidiaria = 1; 
+ 
+SELECT
+    NOM_PAIS_ORIG,
+    NOM_PAIS_DEST,
+    MTCN,
+    FOLIO_AFECT,
+    FECHA_TRANSC,
+    MTO_ENVIO,
+    MTO_ENVIO_USD,
+    TOTAL_IMPTO_MXP,
+    NOM_AGE_ENVIO,
+    NOM_SUBSI_ENVIO,
+    COMISION,
+    CLAVE_SUC_AGE_MVTO,
+    MTO_RED,
+    TIPO_CAMB
+FROM usrcon.OP_DEX_TIPO_CAMBIO A
+JOIN usrcon.TCPAISES_TPCMB B ON A.ID_PAIS_ORIG = B.idPais 
+JOIN usrcon.TCPAISES_TPCMB C ON A.ID_PAIS_DEST = C.idPais 
+JOIN usrcon.TCAGENTES_TPCMB D ON A.ID_AGEN_MVTO = D.idAgente  
+JOIN usrcon.TCSUBSIDIARIAS_TPCMB E ON A.ID_SUBS_MTVO = E.idSubsidiaria 
+WHERE 
+    A.NOM_PAIS_ORIG = 'MEXICO'
+    AND A.NOM_PAIS_DEST = 'GUATEMALA'
+    AND A.ID_AGEN_MVTO  = '1'
+    AND A.ID_SUBS_MTVO  = '4'
+    AND CONVERT(VARCHAR(10),A.FECHA_TRANSC,121)>= '15-06-2024' AND CONVERT(VARCHAR(10),A.FECHA_TRANSC ,121) <= '19-06-2024';
+
+EXEC usrcon.SP_TIPO_CAMBIO_CONCILIACION 
+@origen_pais = 'MEXICO',
+@destino_pais = 'GUATEMALA',
+@peticion_agente = 'ELEKTRA',
+@peticion_subsidiaria = 'SALINAS Y ROCHA',
+@fecha_ini = '2024-06-15',
+@fecha_fin = '2024-06-19';
+
+EXEC usrcon.SP_CONCIL_ALNCAJA_OPEDEX
+@PAIS_ORIGEN = 'MEXICO',
+@PAIS_DESTINO = 'GUATEMALA',
+@SUBSIDIARIA = 'ELEKTRA',
+@AGENTE = 'ELEKTRA',
+@FECHAINI = '28-07-2024',
+@FECHAFIN = '30-07-2024';
+
+EXEC [usrcon].[SP_CONCIL_ALNCAJA_OPEDEX]
+    @PAIS_ORIGEN = 'MEXICO',
+    @PAIS_DESTINO = 'GUATEMALA',
+    @SUBSIDIARIA = 'SALINAS Y ROCHA',
+    @AGENTE = 'ELEKTRA',
+    @FECHAINI = '26-07-2024',
+    @FECHAFIN = '30-07-2024';
+
+
+DECLARE @fecha_fin VARCHAR(50) = '2024-06-15';
+
+SELECT CONVERT(VARCHAR(10), CONVERT(DATE, @fecha_fin, 121), 105);
+
+SELECT
+    NOM_PAIS_ORIG,
+    NOM_PAIS_DEST,
+    MTCN,
+    FOLIO_AFECT,
+    FECHA_TRANSC,
+    MTO_ENVIO,
+    MTO_ENVIO_USD,
+    TOTAL_IMPTO_MXP,
+    NOM_AGE_ENVIO,
+    NOM_SUBSI_ENVIO,
+    COMISION,
+    CLAVE_SUC_AGE_MVTO,
+    MTO_RED,
+    TIPO_CAMB
+FROM usrcon.OP_DEX_TIPO_CAMBIO A
+WHERE 
+    A.NOM_PAIS_ORIG = 'MEXICO'
+    AND A.NOM_PAIS_DEST = 'GUATEMALA'
+    AND A.ID_AGEN_MVTO  = '1'
+    AND A.ID_SUBS_MTVO  = '2';
+   
+   SELECT 
+    	NOM_PAIS_ORIG,
+    	NOM_PAIS_DEST,
+    	MTCN,
+    	FOLIO_AFECT,
+    	FECHA_TRANSC,
+    	MTO_ENVIO,
+    	MTO_ENVIO_USD,
+    	TOTAL_IMPTO_MXP,
+    	NOM_AGE_ENVIO,
+    	NOM_SUBSI_ENVIO,
+    	COMISION,
+    	CLAVE_SUC_AGE_MVTO,
+    	MTO_RED,
+    	TC_TESO_PVP_PD,
+    	TIPO_CAMB  	
+FROM usrcon.OP_DEX_TIPO_CAMBIO A
+WHERE A.NOM_PAIS_ORIG = 'MEXICO'
+AND A.NOM_PAIS_DEST = 'GUATEMALA'
+AND A.ID_AGEN_MVTO = '1'
+AND A.ID_SUBS_MTVO = '2'
+AND CONVERT(VARCHAR(10),A.FECHA_TRANSC,121)>= '26-07-2024' AND CONVERT(VARCHAR(10),A.FECHA_TRANSC ,121) <= '30-07-2024';
+
+    SELECT 
+    	NOM_PAIS_ORIG,
+    	NOM_PAIS_DEST,
+    	MTCN,
+    	FOLIO_AFECT,
+    	FECHA_TRANSC,
+    	MTO_ENVIO,
+    	MTO_ENVIO_USD,
+    	TOTAL_IMPTO_MXP,
+    	NOM_AGE_ENVIO,
+    	NOM_SUBSI_ENVIO,
+    	COMISION,
+    	CLAVE_SUC_AGE_MVTO,
+    	MTO_RED,
+    	TIPO_CAMB
+		FROM usrcon.OP_DEX_TIPO_CAMBIO A
+		WHERE A.NOM_PAIS_ORIG = 'MEXICO'
+		AND A.NOM_PAIS_DEST = 'GUATEMALA'
+		AND A.ID_AGEN_MVTO = '1'
+		AND A.ID_SUBS_MTVO = '2'
+		AND CONVERT(VARCHAR(10),A.FECHA_TRANSC,121)>= '15-06-2024' AND CONVERT(VARCHAR(10),A.FECHA_TRANSC ,121) <= '19-06-2024'; 
+  
+CREATE PROCEDURE usrcon.SP_TIPO_CAMBIO_CONCILIACION   
+ @origen_pais VARCHAR (25), 
+ @destino_pais VARCHAR (25),
+ @peticion_agente VARCHAR (25),
+ @peticion_subsidiaria VARCHAR (25),
+ @fecha_ini VARCHAR (25), 
+ @fecha_fin VARCHAR (25) 
+AS 
+SET NOCOUNT ON
+BEGIN   
+  SELECT
+    NOM_PAIS_ORIG,
+    NOM_PAIS_DEST,
+    MTCN,
+    FOLIO_AFECT,
+    FECHA_TRANSC,
+    MTO_ENVIO,
+    MTO_ENVIO_USD,
+    TOTAL_IMPTO_MXP,
+    NOM_AGE_ENVIO,
+    NOM_SUBSI_ENVIO,
+    COMISION,
+    CLAVE_SUC_AGE_MVTO,
+    MTO_RED,
+    TIPO_CAMB
+	FROM usrcon.OP_DEX_TIPO_CAMBIO A
+	JOIN usrcon.TCPAISES_TPCMB B ON A.ID_PAIS_ORIG = B.idPais 
+	JOIN usrcon.TCPAISES_TPCMB C ON A.ID_PAIS_DEST = C.idPais 
+	JOIN usrcon.TCAGENTES_TPCMB D ON A.ID_AGEN_MVTO = D.idAgente  
+	JOIN usrcon.TCSUBSIDIARIAS_TPCMB E ON A.ID_SUBS_MTVO = E.idSubsidiaria 
+	WHERE A.NOM_PAIS_ORIG = @origen_pais
+    	AND A.NOM_PAIS_DEST = @destino_pais
+    	AND A.NOM_AGEN_MVTO = @peticion_agente
+    	AND A.NOM_SUBS_MTVO = @peticion_subsidiaria
+    	AND CONVERT(VARCHAR(10),A.FECHA_TRANSC,121)>= @fecha_ini AND CONVERT(VARCHAR(10),A.FECHA_TRANSC ,121) <= @fecha_fin; 
+END 
+   
+   
+SELECT 
+  CONVERT(DATETIME, A.FECHA_TRANSC, 21) AS fecha_convertida
+FROM 
+  usrcon.OP_DEX_TIPO_CAMBIO A;
+   
+   ----Columnas que no son fehcas-----
+   SELECT FECHA_TRANSC
+FROM usrcon.OP_DEX_TIPO_CAMBIO
+WHERE ISDATE(FECHA_TRANSC) = 0;
+
+SELECT CONVERT(DATETIME, FECHA_TRANSC, 103) AS FECHA_TRANSC_DATETIME
+FROM usrcon.OP_DEX_TIPO_CAMBIO;
+ 
+----------SubsidiariaSeleccionado----------------
+SELECT
+A.subsidiaria 
+FROM usrcon.TCSUBSIDIARIAS_TPCMB A
+WHERE A.idPais = 2 AND A.idAgente = 1;
+
+CREATE PROCEDURE usrcon.SP_TIPO_CAMBIO_SUBSIDIARIA
+@idPais int,
+@idAgente int
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	BEGIN TRY
+		SELECT
+		A.subsidiaria 
+		FROM usrcon.TCSUBSIDIARIAS_TPCMB A
+		WHERE A.idPais = @idPais AND A.idAgente = @idAgente;
+    END TRY
+	BEGIN CATCH
+        DECLARE @ErrorMessage nvarchar(4000);
+        SET @ErrorMessage = ERROR_MESSAGE();
+        RAISERROR (@ErrorMessage, 16, 1); 
+    END CATCH;
+END
+
+EXEC usrcon.SP_TIPO_CAMBIO_SUBSIDIARIA 
+@idPais = 2,
+@idAgente = 62;
+
+--------------------------------------------------------
+
+DROP TABLE usrcon.TCAGENTES;
+
+CREATE TABLE usrcon.TRANSACIONES_TIPO_CAMBIO (
+	mensaje varchar(25) NULL,
+	folio varchar(25) NULL,
+	peticion_agente varchar(25)  NULL,
+	peticion_subsidiaria varchar(25)  NULL,
+	origen_moneda varchar(25) NULL,
+	origen_pais varchar(25)  NULL,
+	origen_gananciaCambiaria varchar(25)  NULL,
+	origen_valorEnvio varchar(25)  NULL,
+	origen_envioFinal varchar(25) NULL,
+	origen_vigencia varchar(25)  NULL,
+	destino_moneda varchar(25) NULL,
+	destino_pais varchar(25)  NULL,
+	destino_gananciaCambiaria varchar(25)  NULL,
+	destino_valorPago varchar(25) NULL,
+	destino_pagoFinal varchar(25) NULL,
+	destino_vigencia varchar(25)  NULL,
+	usuario_Consulta varchar(25) NULL,
+	fecha_operacion varchar(25) NULL
+);
+
+
+
+INSERT INTO usrcon.TCMONEDAS VALUES(1, 'PESOS');
+INSERT INTO usrcon.TCMONEDAS VALUES(2, 'QUETZALES');
+INSERT INTO usrcon.TCMONEDAS VALUES(3, 'LEMPIRAS');
+INSERT INTO usrcon.TCMONEDAS VALUES(5, 'DOLAR BALBOA');
+INSERT INTO usrcon.TCMONEDAS VALUES(6, 'DOLARES');
+
+INSERT INTO usrcon.TCMONEDAS_PAISES VALUES(1,1,1, 'PESOS');
+INSERT INTO usrcon.TCMONEDAS_PAISES VALUES(2,2,2, 'QUETZALES');
+INSERT INTO usrcon.TCMONEDAS_PAISES VALUES(3,3,3, 'LEMPIRAS');
+INSERT INTO usrcon.TCMONEDAS_PAISES VALUES(4,5,5, 'DOLAR BALBOA');
+INSERT INTO usrcon.TCMONEDAS_PAISES VALUES(5,5,6, 'DOLARES');
+
+DROP TABLE TCMONEDAS; 
+SELECT * FROM usrcon.TCAGENTES;
+SELECT * FROM usrcon.TCMONEDAS;
+SELECT * FROM usrcon.TCPAISES;
+SELECT * FROM usrcon.TCMONEDAS_PAISES;
+SELECT * FROM usrcon.TRANSACIONES_TIPO_CAMBIO;
+
+SELECT PAIS AS PAISORIGEN FROM usrcon.TCPAISES WHERE usrcon.tcpaises.idpais = 1;
+SELECT PAIS AS PAISDESTINO FROM usrcon.TCPAISES WHERE usrcon.TCPAISES.IDPAIS <> 1;
+
+ALTER PROCEDURE usrcon.SP_TIPO_CAMBIO_COMBO
+ @OPC int
+AS
+SET NOCOUNT ON 
+  IF @OPC = 1
+  BEGIN
+  SELECT PAIS AS PAISORIGEN FROM usrcon.TCPAISES WHERE usrcon.tcpaises.idpais = 1; 
+  END
+ 
+  IF @OPC = 2
+  BEGIN
+  SELECT PAIS AS PAISDESTINO FROM usrcon.TCPAISES WHERE usrcon.TCPAISES.IDPAIS <> 1;
+  END
+SET NOCOUNT OFF
+
+DROP PROCEDURE IF EXISTS usrcon.SP_TIPO_CAMBIO;
+
+CREATE PROCEDURE usrcon.SP_TIPO_CAMBIO  
+  @mensaje VARCHAR (25),  
+  @folio VARCHAR(25),  
+  @peticion_agente VARCHAR(25),
+  @peticion_subsidiaria VARCHAR(25),
+  @origen_moneda VARCHAR(25),
+  @origen_pais VARCHAR (25),
+  @origen_gananciaCambiaria VARCHAR (25),  
+  @origen_valorEnvio VARCHAR (25),  
+  @origen_envioFinal VARCHAR (25),  
+  @origen_vigencia VARCHAR (25),
+  @destino_moneda VARCHAR(25),
+  @destino_pais VARCHAR (25),  
+  @destino_gananciaCambiaria VARCHAR (25),  
+  @destino_valorPago VARCHAR (25),  
+  @destino_pagoFinal VARCHAR (25),  
+  @destino_vigencia VARCHAR (25),
+  @usuario_Consulta VARCHAR (50),
+  @fecha_operacion VARCHAR (50)
+  
+AS  
+BEGIN  
+DECLARE @duplicateExists INT  
+  
+-- Revisa que el folio no este duplicado  
+SELECT @duplicateExists = CASE WHEN EXISTS (  
+  SELECT * FROM usrcon.TRANSACIONES_TIPO_CAMBIO WHERE folio = @folio  
+) THEN 1 ELSE 0 END  
+  
+IF @duplicateExists = 0  
+BEGIN  
+  -- Inserta los datos y devuelve la información  
+INSERT INTO usrcon.TRANSACIONES_TIPO_CAMBIO (
+mensaje, 
+folio,
+peticion_agente,
+peticion_subsidiaria,
+origen_moneda,
+origen_pais,
+origen_gananciaCambiaria, 
+origen_valorEnvio, 
+origen_envioFinal,
+origen_vigencia,
+destino_moneda,
+destino_pais,
+destino_gananciaCambiaria, 
+destino_valorPago, 
+destino_pagoFinal, 
+destino_vigencia,
+usuario_Consulta,
+fecha_operacion
+)  
+
+VALUES (
+@mensaje, 
+@folio, 
+@peticion_agente,
+@peticion_subsidiaria,
+@origen_moneda,
+@origen_pais,
+@origen_gananciaCambiaria,
+@origen_valorEnvio, 
+@origen_envioFinal,
+@origen_vigencia, 
+@destino_moneda,
+@destino_pais,
+@destino_gananciaCambiaria, 
+@destino_valorPago, 
+@destino_pagoFinal, 
+@destino_vigencia,
+@usuario_Consulta,
+@fecha_operacion
+)  
+
+END  
+ELSE  
+BEGIN  
+    -- Muestra el mensaje si esta duplicado  
+    PRINT 'Folio duplicado - folio: ' + @folio  
+END
+SET NOCOUNT ON
+END;
+
+  
+ SELECT 
+  D.pais AS origen_pais, 
+  A.origen_valorEnvio,
+  B.moneda AS moneda,
+  E.pais AS destino_pais,
+  A.destino_valorPago,
+  C.moneda AS divisa
+  FROM usrcon.TRANSACIONES_TIPO_CAMBIO A 
+  JOIN usrcon.TCMONEDAS_PAISES B ON A.origen_moneda  = B.idMoneda 
+  JOIN usrcon.TCMONEDAS_PAISES C ON A.destino_moneda = C.idMoneda 
+  JOIN usrcon.TCPAISES D ON A.origen_pais = D.idPais
+  JOIN usrcon.TCPAISES E ON A.destino_pais = E.idPais 
+  WHERE D.pais = 'MEXICO'
+  AND E.pais = 'PANAMA';
+ 
+SELECT PAIS AS PAISORIGEN FROM usrcon.TCPAISES WHERE usrcon.tcpaises.pais  = 'MEXICO'; 
+SELECT PAIS AS PAISDESTINO FROM usrcon.TCPAISES WHERE usrcon.tcpaises.pais  = 'PANAMA'; 
+ 
+   EXEC usrcon.SP_TIPO_CAMBIO_CONSULTA
+    @origen_pais = 'MEXICO',
+	@destino_pais = 'PANAMA',
+	@fecha_ini = '2024-07-01',
+	@fecha_fin = '2024-07-02';
+  
+
+
+ EXEC usrcon.SP_TIPO_CAMBIO_COMBO
+    @OPC = 2;
+
+CREATE TABLE usrcon.TC_PARAM_MEX_GUA (
+	idPaisOrigen int NOT NULL,
+	idPaisDestino int NOT NULL,
+	idAgente int NOT NULL,
+	idSubsidiaria int NOT NULL,
+	divisaOrigen int NOT NULL,
+	divisaDestino int NOT NULL,
+	proceso varchar(15) NULL,
+	estatus int NULL
+);
+
+CREATE TABLE usrcon.TC_PARAM_MEX_HON (
+	idPaisOrigen int NOT NULL,
+	idPaisDestino int NOT NULL,
+	idAgente int NOT NULL,
+	idSubsidiaria int NOT NULL,
+	divisaOrigen int NOT NULL,
+	divisaDestino int NOT NULL,
+	proceso varchar(15) NULL,
+	estatus int NULL
+);
+
+CREATE TABLE usrcon.TC_PARAM_MEX_PAN (
+	idPaisOrigen int NOT NULL,
+	idPaisDestino int NOT NULL,
+	idAgente int NOT NULL,
+	idSubsidiaria int NOT NULL,
+	divisaOrigen int NOT NULL,
+	divisaDestino int NOT NULL,
+	proceso varchar(15) NULL,
+	estatus int NULL
+);
+
+DROP TABLE usrcon.TC_PARAM_MEX_PAN;
+DROP TABLE usrcon.TC_PARAM_MEX_HON;
+DROP TABLE usrcon.TC_PARAM_MEX_GUA;
+
+SELECT * FROM usrcon.TC_PARAM_MEX_GUA;
+ 
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,1,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+INSERT INTO usrcon.TC_PARAM_MEX_GUA values (1,2,5,1,1,2,'Remesas',1);
+
+SELECT * FROM usrcon.TC_ALNCAJA_CONCIL;
+SELECT * FROM usrcon.OP_DEX_TIPO_CAMBIO;
+
+
+CREATE PROCEDURE usrcon.SP_TIPO_CAMBIO_CONCILIACION
+   
+AS   
+BEGIN  
+  
+  SELECT
+  NOM_PAIS_ORIG,
+  NOM_PAIS_DEST,
+  MTCN,
+  FOLIO_AFECT,
+  FECHA_TRANSC,
+  MTO_ENVIO,
+  MTO_ENVIO_USD,
+  TOTAL_IMPTO_MXP,
+  NOM_AGE_ENVIO,
+  NOM_SUBSI_ENVIO,
+  COMISION,
+  CLAVE_SUC_AGE_MVTO,
+  MTO_RED,
+  TIPO_CAMB
+  FROM usrcon.OP_DEX_TIPO_CAMBIO
+   
+END  
+ 
+SET NOCOUNT ON
+
+CREATE PROCEDURE usrcon.SP_TIPO_CAMBIO_CONCILIACION
+    @param1 int = NULL, -- add parameters as needed
+    @param2 varchar(50) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        SELECT
+            NOM_PAIS_ORIG,
+            NOM_PAIS_DEST,
+            MTCN,
+            FOLIO_AFECT,
+            FECHA_TRANSC,
+            MTO_ENVIO,
+            MTO_ENVIO_USD,
+            TOTAL_IMPTO_MXP,
+            NOM_AGE_ENVIO,
+            NOM_SUBSI_ENVIO,
+            COMISION,
+            CLAVE_SUC_AGE_MVTO,
+            MTO_RED,
+            TIPO_CAMB
+        FROM usrcon.OP_DEX_TIPO_CAMBIO
+        WHERE -- add filter conditions based on parameters
+            (@param1 IS NULL OR column1 = @param1)
+            AND (@param2 IS NULL OR column2 = @param2);
+    END TRY
+    BEGIN CATCH
+        DECLARE @ErrorMessage nvarchar(4000);
+        SET @ErrorMessage = ERROR_MESSAGE();
+        RAISERROR (@ErrorMessage, 16, 1);
+    END CATCH;
+END;
+
+CREATE PROCEDURE usrcon.SP_TIPO_CAMBIO_CONCILIACION  
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        SELECT
+            NOM_PAIS_ORIG,
+            NOM_PAIS_DEST,
+            MTCN,
+            FOLIO_AFECT,
+            FECHA_TRANSC,
+            MTO_ENVIO,
+            MTO_ENVIO_USD,
+            TOTAL_IMPTO_MXP,
+            NOM_AGE_ENVIO,
+            NOM_SUBSI_ENVIO,
+            COMISION,
+            CLAVE_SUC_AGE_MVTO,
+            MTO_RED,
+            TIPO_CAMB
+        FROM usrcon.OP_DEX_TIPO_CAMBIO;
+    END TRY
+    BEGIN CATCH
+        DECLARE @ErrorMessage nvarchar(4000);
+        SET @ErrorMessage = ERROR_MESSAGE();
+        RAISERROR (@ErrorMessage, 16, 1); 
+    END CATCH;
+   
+END;
+
+
+INSERT INTO usrcon.OP_DEX_TIPO_CAMBIO VALUES ('','','MEXICO','','GUATEMALA','','','','','123','','123456789','2024-07-11','123','123','123','','','ELEKTRA','ELEKTRA','','','','','','','123','','123','123','123');
+INSERT INTO usrcon.OP_DEX_TIPO_CAMBIO VALUES ('','','MEXICO','','HONDURAS','','','','','123','','123456789','2024-07-11','123','123','123','','','ELEKTRA','ELEKTRA','','','','','','','123','','123','123','123');
+INSERT INTO usrcon.OP_DEX_TIPO_CAMBIO VALUES ('','','MEXICO','','PANAMA','','','','','123','','123456789','2024-07-11','123','123','123','','','ELEKTRA','ELEKTRA','','','','','','','123','','123','123','123');
+
+EXEC usrcon.SP_TIPO_CAMBIO_CONCILIACION;
+
+
+SELECT TOP(100000000)
+	   ALN.fcfolio,
+	   PARALN.FITIPO,
+	   T071_CEN_UPDATE,
+	   T071_ACC,
+	   T071_NUM_OPERATION,
+	   T071_CODE,
+	   T071_OBSERVATIONS, 
+	   T071_AMOUNT,
+	   T071_DAT_OPERATION,
+	   T071_DAT_ACCT,
+	   T071_INTREF,
+	   FCTIPODESC,
+	   ALN.fncontatranx AS CONTADOR,
+	   ALN.fnmontoxvolu AS COMISION
+FROM usrcon.SOCIOS_UNITELLER_ALN ALN WITH(NOLOCK)
+INNER JOIN usrcon.SOCIOS_PARAMETRIA_ALN PARALN WITH(NOLOCK)
+ON ALN.T071_CODE=PARALN.FCCODIGO
+AND ALN.fipais=PARALN.FIPAIS 
+AND ALN.fiidsocio=PARALN.FINEGOCIO 
+AND ALN.fcfolio= PARALN.FITIPO
+WHERE ALN.fipais = 1 
+AND ALN.T071_DAT_OPERATION >= '2024-05-22'
+AND ALN.T071_DAT_OPERATION < '2024-06-18'
+AND ALN.fcfolio = '5'
+
+SELECT 
+FCCODIGO,
+FIPAIS,
+FINEGOCIO,
+FITIPO
+
+FROM usrcon.SOCIOS_PARAMETRIA_ALN;
+
+SELECT 
+T071_CODE,
+fipais,
+fiidsocio,
+fcfolio
+
+FROM usrcon.SOCIOS_UNITELLER_ALN;
+---------------------------------------------------------------------
+SELECT 
+ALN.T071_OBSERVATIONS,
+ALN.T071_CODE,
+PARALN.FCCODIGO,
+ALN.fipais,
+PARALN.FIPAIS,
+ALN.fiidsocio,
+PARALN.FINEGOCIO,
+ALN.fcfolio,
+PARALN.FITIPO
+FROM usrcon.SOCIOS_UNITELLER_ALN ALN 
+JOIN usrcon.SOCIOS_PARAMETRIA_ALN PARALN 
+ON 
+ALN.T071_CODE =PARALN.FCCODIGO 
+AND ALN.fipais=PARALN.FIPAIS 
+AND ALN.fiidsocio=PARALN.FINEGOCIO 
+AND ALN.fcfolio= PARALN.FITIPO
+WHERE ALN.fipais = 1 
+AND ALN.T071_DAT_OPERATION >= '2024-06-04'
+AND ALN.T071_DAT_OPERATION < '2024-06-06'
+AND ALN.fcfolio = '2'; -- 1, 2, 3, 4
+------------------------------------------------------------------------
+SELECT 
+FITIPOPAGO,
+FCFOLIOALN 
+FROM usrcon.SOCIOS_TIPOPAGO WHERE FISOCIO ='1918';
+
+SELECT *
+FROM usrcon.SOCIOS_TIPOPAGO ;
+
+SELECT 
+FITIPO AS FITIPOPARAM,
+FCTIPODESC AS FCTIPODESCPARAM,
+TIPOPAGO.FITIPOPAGO,
+TIPOPAGO.FCTIPOPAGO,
+TIPOPAGO.FCFOLIOALN 
+FROM usrcon.SOCIOS_PARAMETRIA_ALN ALN
+JOIN usrcon.SOCIOS_TIPOPAGO TIPOPAGO ON TIPOPAGO.FCFOLIOALN = ALN.FITIPO
+WHERE FINEGOCIO  ='1918';
+
+
+SELECT TOP(10)
+	   FISUCURSAL SUCURSAL,
+	   'N/A' CUENTA,
+	   FINOTRANSAC,
+	   FITIPOOP,
+	   FCREFMOV,
+	   FNIMPMOV,
+	   FDMOVFECHR,
+	   FDFECHAREGCENTRAL,
+	   'N/A' INFERTAZ,
+	   'Ventanilla' TIPO,
+	   fncontatranx CONTADOR,
+	   fnmontoxvolu COMISION
+FROM usrcon.SOCIOS_UNITELLER_CAJA WITH(NOLOCK)
+WHERE FIPAIS = @PAIS
+AND FDFECHAREGCENTRAL >= @FEC_INI
+AND FDFECHAREGCENTRAL < @FEC_FIN
+
+SELECT * FROM usrcon.SOCIOS_UNITELLER_CAJA;
+
+
+
+
+
+
+
+

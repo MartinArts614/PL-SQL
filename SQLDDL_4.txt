@@ -1,0 +1,14 @@
+CREATE TABLE [usrcon].[TCSUBSIDIARIAS_TPCMB](
+[idTbl] int primary key,
+[idPais] int,
+[idAgente] int,
+[idSubsidiaria] int,
+[subsidiaria] VARCHAR(50),
+FOREIGN KEY (idPais) REFERENCES [usrcon].[TCPAISES_TPCMB](idPais)
+) WITH(DATA_COMPRESSION=PAGE);
+
+
+
+SELECT * FROM [usrcon].[TCSUBSIDIARIAS_TPCMB];
+
+DROP TABLE [usrcon].[TCSUBSIDIARIAS_TPCMB];
